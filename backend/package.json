@@ -1,0 +1,14 @@
+{
+  "name": "tag-match",
+  "version": "1.0.0",
+  "description": "Tag matching app using Neo4j",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eric Rosendale",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
