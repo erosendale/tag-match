@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const mongoose = require('mongoose');
-const config = require('./config');
 
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
@@ -14,18 +13,19 @@ require('dotenv').config();
 
 const app = express();
 
-
 const port = process.env.PORT || 3000;
 const dbPort = process.env.DB_PORT || 27017;
 const dbUrl = process.env.DB_URL || "localhost";
 const dbCollection = process.env.DB_COLLECTION || "auth-test";
+const dbUsername = process.env.DB_USERNAME || "root";
+const dbPassword = process.env.DB_PASSWORD || "password";
 //sets the required variables from Environment Variables.
 mongoose.set('useCreateIndex', true);
-//fixes an issue with a depricated default in Mongoose.js
-mongoose.connect(`mongodb://${dbUrl}/${dbCollection}`, {useNewUrlParser: true})
-       .then(_ => console.log('Connected Successfully to MongoDB'))
-       .catch(err => console.error(err));
 
+mongoose.connect(`mongodb://${dbUsername}:${dbPassword}@${dbUrl}/${dbCollection}?authSource=admin&w=1`, { 
+  useNewUrlParser: true //fixes an issue with a depricated default in Mongoose.js
+});
+  
 app.use(passport.initialize());
 // initializes the passport configuration
 
@@ -38,18 +38,25 @@ app.use(bodyParser.json());
 
 //custom Middleware for logging each request going to the API
 app.use((req,res,next) => {
-    if (req.body) log.info(req.body);
-    if (req.params) log.info(req.params);
-    if(req.query) log.info(req.query);
-    log.info(`Received a ${req.method} request from ${req.ip} for ${req.url}`);
+  if (req.body) console.log(req.body);
+  if (req.params) console.log(req.params);
+  if(req.query) console.log(req.query);
+  console.log(`Received a ${req.method} request from ${req.ip} for ${req.url}`);
   next();
 });
 
 app.use('/users', require('./routes/user'));
+
+
+app.get('/test', passport.authenticate('jwt', {session: false}), (req,res) => {
+  res.send('Authenticated!');
+});
+
+
 //registers our authentication routes with Express.
 app.listen(port, err => {
-    if(err) console.error(err);
-    console.log(`Listening for Requests on port: ${port}`);
+  if(err) console.error(err);
+  console.log(`Listening for Requests on port: ${port}`);
 });
 
 

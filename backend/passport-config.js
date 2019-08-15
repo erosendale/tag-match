@@ -2,7 +2,7 @@ const {Strategy, ExtractJwt} = require('passport-jwt');
 
 require('dotenv').config();
 
-const secret = process.env.SECRET || 'some other secret as default';
+const secret = process.env.SECRET || 'the default secret';
 
 const mongoose = require('mongoose');
 
