@@ -46,10 +46,14 @@ app.use((req,res,next) => {
 });
 
 app.use('/users', require('./routes/user'));
+app.use('/profile', passport.authenticate('jwt', {session: false}), require('./routes/profile').routes);
+app.use('/find', passport.authenticate('jwt', {session: false}), require('./routes/find'));
+
+
 
 
 app.get('/test', passport.authenticate('jwt', {session: false}), (req,res) => {
-  res.send('Authenticated!');
+  res.send(JSON.stringify(req.user));
 });
 
 
