@@ -9,13 +9,6 @@ const { shuffle } = require('../helpers/utils');
 // const config = ConfigManager.getConfig('mongo');
 // const collectionProfiles = 'profiles';
 
-
-// const router = require('express').Router();
-
-// router.get('/', (req, res) => {
-//     findProfiles(req, res);
-// });
-
 module.exports = findProfiles;
 
 function findProfiles(req, res) {
@@ -34,7 +27,32 @@ function findProfiles(req, res) {
     });
 }
 
-//module.exports = findProfiles
+function find(profile) {
+    
+    const likesPromise = findLikes(profile);
+    const findPromise = findTags(profile);
+
+    // Return when we get a response from both
+    return new Promise((resolve, reject) => {
+        Promise.all([likesPromise, findPromise]).then(function(values) {
+            // We're done now so close the driver
+            Neo4jConn.driver.close();
+
+            // Returns 2 lists of profiles
+            // Shuffle them together so the likes aren't at the top
+            let resProfiles = values[0].concat(values[1]);
+            resProfiles = shuffle(resProfiles);
+
+            resolve(resProfiles);
+        })
+        .catch(error => {
+            console.log(error);
+            Neo4jConn.driver.close();
+            reject(error);
+        });
+    });
+    
+}
 
 function findLikes(profile) {
 
@@ -79,9 +97,7 @@ function findLikes(profile) {
         })
         .catch(error => {
             console.log(error);
-
             session.close();
-
             reject(error);
         });
     });
@@ -133,43 +149,9 @@ function findTags(profile) {
         })
         .catch(error => {
             console.log(error);
-
             session.close();
-
             reject(error);
         });
     });
-}
-
-function find(profile) {
-    
-    const likesPromise = findLikes(profile);
-    const findPromise = findTags(profile);
-
-    return new Promise((resolve, reject) => {
-        Promise.all([likesPromise, findPromise]).then(function(values) {
-            console.log(values);
-            // We're done now so close the driver
-            Neo4jConn.driver.close();
-
-            // Returns 2 lists of profiles
-            // Shuffle them together so the likes aren't at the top
-            let resProfiles = values[0].concat(values[1]);
-            resProfiles = shuffle(resProfiles);
-
-            resolve(resProfiles);
-        })
-        .catch(error => {
-            console.log(error);
-
-            Neo4jConn.driver.close();
-
-            reject(error);
-        });
-    });
-    
-
-    // Return when we get a response from both
-
 }
 

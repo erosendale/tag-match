@@ -9,3 +9,6 @@ done
 
 cat neo4j/schema.cql | docker exec -i local_stack_neo4j_1 cypher-shell -u neo4j -p test
 echo "\nNeo4j indexes created"
+
+# Not necessary for tests since supertest can startup and stop the app
+#pm2 start ../backend/app.js --watch

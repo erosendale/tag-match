@@ -11,6 +11,11 @@ function shuffle(a) {
     return a;
 }
 
+function isEmpty(obj) {
+    return Object.getOwnPropertyNames(obj).length === 0
+}
+
 module.exports = {
-    shuffle
+    shuffle,
+    isEmpty
 };

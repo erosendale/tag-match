@@ -1,9 +1,17 @@
 const Neo4jConn = require('../helpers/Neo4j');
 
+const router = require('express').Router();
+
+router.route('/:userId')
+    .get(addLike)
+    .delete(deleteLike);
+
+module.exports = router;
+
 function addLike(req,res) {
 
-    const userId = req.headers.userid;
-    const recipId = req.swagger.params.recipid.value.recipid;
+    const userId = req.user.id;
+    const recipId = req.params.userId;
 
     // Start a session with neo4j
     const session = Neo4jConn.driver.session();
@@ -31,8 +39,8 @@ function addLike(req,res) {
 // unmatch
 function deleteLike(req,res) {
 
-    const userId = req.headers.userid;
-    const recipId = req.swagger.params.recipid.value;
+    const userId = req.user.id;
+    const recipId = req.params.userId;
 
     // Start a session with neo4j
     const session = Neo4jConn.driver.session();
@@ -59,9 +67,4 @@ function deleteLike(req,res) {
             res.status(500).json({message: JSON.stringify(error)});
         }
     });
-}
-
-module.exports = {
-    addLike,
-    deleteLike
 }

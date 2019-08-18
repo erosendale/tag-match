@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const logger = require('./helpers/logger');
 
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
@@ -38,19 +39,27 @@ app.use(bodyParser.json());
 
 //custom Middleware for logging each request going to the API
 app.use((req,res,next) => {
-  if (req.body) console.log(req.body);
-  if (req.params) console.log(req.params);
-  if(req.query) console.log(req.query);
-  console.log(`Received a ${req.method} request from ${req.ip} for ${req.url}`);
+  function isEmpty(obj) {
+    return Object.getOwnPropertyNames(obj).length === 0
+  }
+  logger.log(`Received a ${req.method} request from ${req.ip} for ${req.url}`);
+  if (!isEmpty(req.body))   logger.log(req.body);
+  if (!isEmpty(req.params)) logger.log(req.params);
+  if (!isEmpty(req.query))  logger.log(req.query);
   next();
 });
 
-app.use('/users', require('./routes/user'));
-app.use('/profile', passport.authenticate('jwt', {session: false}), require('./routes/profile').routes);
-app.use('/find', passport.authenticate('jwt', {session: false}), require('./routes/find'));
+// Error logging
+app.use(function (err, req, res, next) {
+  logger.error(err.stack)
+  res.status(500).send('Something broke!')
+})
 
-
-
+// Routes
+app.use('/users', require('./controllers/user'));
+app.use('/profile', passport.authenticate('jwt', {session: false}), require('./controllers/profile').routes);
+app.use('/find', passport.authenticate('jwt', {session: false}), require('./controllers/find'));
+app.use('/like', passport.authenticate('jwt', {session: false}), require('./controllers/like'));
 
 app.get('/test', passport.authenticate('jwt', {session: false}), (req,res) => {
   res.send(JSON.stringify(req.user));
@@ -62,44 +71,5 @@ app.listen(port, err => {
   if(err) console.error(err);
   console.log(`Listening for Requests on port: ${port}`);
 });
-
-
-// app.post('/login', passport.authenticate('local', { successRedirect: '/',
-//                                                     failureRedirect: '/login' }));
-
-// My custom middleware
-// app.use(function timeLog(req, res, next) {
-//     console.log('Time: ', Date.now());
-//     next(); // pass control to the next handler
-// });
-
-// router.post('/login', passport.authenticate('local', { 
-//     successRedirect: '/',
-//     failureRedirect: '/login' }));
-
-// router.route('/profile/:userId')
-//     .get(function (req, res) {
-//         res.send(`get profile! ${req.params.userId}`);
-//     })
-//     .post(function (req, res) {
-//         res.send(`post profile! ${req.params.userId}`);
-//     });
-
-// router.route('/find')
-//     .get(function (req, res) {
-//         res.send(`finding matches!`);
-//     });
-
-// router.route('/like/:userId')
-//     .post(function (req, res) {
-//         res.send(`liked user! ${req.params.userId}`);
-//     })
-//     .delete(function (res, req) {
-//         res.send(`deleted like for user! ${req.params.userId}`);
-//     });
-
-// app.use('/api/v1', router);
-   
-// app.listen(3000, () => console.log(`Listening on port 3000`));
 
 module.exports = app; // for testing
