@@ -25,7 +25,7 @@ module.exports = doLogin;
 function register() {
   return new Promise((resolve, reject) => {
     request(app)
-      .post('/users/register')
+      .post('/api/v1/users/register')
       .send(user)
       .set('Accept', 'application/json')
       .end(function(err, res) {
@@ -43,7 +43,7 @@ function register() {
 function login() {
   return new Promise((resolve, reject) => {
     request(app)
-    .post('/users/login')
+    .post('/api/v1/users/login')
     .send(user)
     .set('Accept', 'application/json')
     .end(function(err, res) {

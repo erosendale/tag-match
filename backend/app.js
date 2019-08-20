@@ -5,6 +5,10 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const mongoose = require('mongoose');
 const logger = require('./helpers/logger');
+const { isEmpty } = require('./helpers/utils');
+const YAML = require('yamljs');
+const swaggerUi = require('swagger-ui-express'),
+    swaggerDocument = YAML.load('./swagger.yaml');
 
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
@@ -39,9 +43,6 @@ app.use(bodyParser.json());
 
 //custom Middleware for logging each request going to the API
 app.use((req,res,next) => {
-  function isEmpty(obj) {
-    return Object.getOwnPropertyNames(obj).length === 0
-  }
   logger.log(`Received a ${req.method} request from ${req.ip} for ${req.url}`);
   if (!isEmpty(req.body))   logger.log(req.body);
   if (!isEmpty(req.params)) logger.log(req.params);
@@ -49,22 +50,29 @@ app.use((req,res,next) => {
   next();
 });
 
-// Error logging
-// app.use(function (err, req, res, next) {
-//   logger.error('test');
+// Routes
+router.use('/users', require('./controllers/user'));
+router.use('/profile', passport.authenticate('jwt', {session: false}), require('./controllers/profile').routes);
+router.use('/find', passport.authenticate('jwt', {session: false}), require('./controllers/find'));
+router.use('/like', passport.authenticate('jwt', {session: false}), require('./controllers/like'));
+
+// router.use(function (err, req, res, next) {
+//   logger.error(err);
 //   if (!err.statusCode) err.statusCode = 500;
-//   res.status(err.statusCode).json(err.stack);
+//   res.status(err.statusCode).json({error: err});
+//   next();
 // })
 
-// Routes
-app.use('/users', require('./controllers/user'));
-app.use('/profile', passport.authenticate('jwt', {session: false}), require('./controllers/profile').routes);
-app.use('/find', passport.authenticate('jwt', {session: false}), require('./controllers/find'));
-app.use('/like', passport.authenticate('jwt', {session: false}), require('./controllers/like'));
+app.use('/api/v1', router);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.get('/test', passport.authenticate('jwt', {session: false}), (req,res) => {
-  res.send(JSON.stringify(req.user));
+// Error logging
+app.use(function (err, req, res, next) {
+  logger.error(err);
+  if (!err.statusCode) err.statusCode = 500;
+  res.status(err.statusCode).json({error: err});
 });
+
 
 
 //registers our authentication routes with Express.

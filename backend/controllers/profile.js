@@ -27,10 +27,7 @@ function getProfile(req, res, next) {
   .then(profile => {
     res.json(profile);
   })
-  //.catch(next);
-  .catch(error => {
-    res.status(error.statusCode).json(error.stack); // stack includes the error msg and the stack trace
-  });
+  .catch(next);
 }
 
 function readProfileFromDb(userId) {
@@ -54,8 +51,10 @@ function readProfileFromDb(userId) {
 
       // Throw a not found exception if we couldn't find a profile
       if (typeof profile === 'undefined') {
-        const error = new Error(`No profile found for userId: ${userId}`);
-        error.statusCode = 400;
+        const error = new DetailedError(400,
+          DetailedError.errorCodes.ProfileNotFound, 
+          `No profile found for userId: ${userId}`, 
+          new Error().stack);
         reject(error);
         return;
       }

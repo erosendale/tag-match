@@ -4,27 +4,26 @@ const app = require('../app');
 
 describe('Profile tests', function() {
 
-  // const profile = {
-  //   tags: ['hockey', 'football', 'surfing']
-  // }
+  const profile = {
+    tags: ['hockey', 'football', 'surfing']
+  }
 
   let authenticatedUser;
 
   beforeAll(async () => {
     authenticatedUser = await require('./bootstrap')();
-    console.log(`user: ${JSON.stringify(authenticatedUser)}`);
   })
 
   it('can get a profile', function(done) {
     request(app)
-      .get(`/profile/${authenticatedUser.userId}`)
+      .get(`/api/v1/profile/${authenticatedUser.userId}`)
       .set('Accept', 'application/json')
       .set('Authorization', authenticatedUser.accessToken)
       .end(function(err, res) {
         expect('Content-Type', 'application/json; charset=utf-8')
         expect(res.status).toEqual(400); // no profile
-
-        console.log(res.body);
+        expect(res.body.error).toBeDefined();
+        expect(res.body.error.errorCode).toEqual(101); // profile not found error
 
         expect(err).toBeNull();
         done();

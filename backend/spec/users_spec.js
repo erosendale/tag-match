@@ -12,7 +12,7 @@ describe ('auth tests', function() {
 
   it('can register a user', function(done) {
     request(app)
-      .post('/users/register')
+      .post('/api/v1/users/register')
       .send(user)
       .set('Accept', 'application/json')
       .end(function(err, res) {
@@ -30,7 +30,7 @@ describe ('auth tests', function() {
 
   it('can login a user', function(done) {
     request(app)
-      .post('/users/login')
+      .post('/api/v1/users/login')
       .send(user)
       .set('Accept', 'application/json')
       .end(function(err, res) {
