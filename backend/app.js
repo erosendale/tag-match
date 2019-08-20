@@ -50,10 +50,11 @@ app.use((req,res,next) => {
 });
 
 // Error logging
-app.use(function (err, req, res, next) {
-  logger.error(err.stack)
-  res.status(500).send('Something broke!')
-})
+// app.use(function (err, req, res, next) {
+//   logger.error('test');
+//   if (!err.statusCode) err.statusCode = 500;
+//   res.status(err.statusCode).json(err.stack);
+// })
 
 // Routes
 app.use('/users', require('./controllers/user'));

@@ -22,7 +22,7 @@ describe('Profile tests', function() {
       .set('Authorization', authenticatedUser.accessToken)
       .end(function(err, res) {
         expect('Content-Type', 'application/json; charset=utf-8')
-        expect(res.status).toEqual(200);
+        expect(res.status).toEqual(400); // no profile
 
         console.log(res.body);
 

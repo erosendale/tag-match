@@ -20,29 +20,16 @@ module.exports = {
   readProfileFromDb
 };
 
-function getProfile(req, res) {
+function getProfile(req, res, next) {
   // Get the requested user profile
   const userId = req.params.userId;
   readProfileFromDb(userId)
   .then(profile => {
     res.json(profile);
   })
+  //.catch(next);
   .catch(error => {
-
-    function replaceErrors(key, value) {
-      if (value instanceof Error) {
-          var error = {};
-  
-          Object.getOwnPropertyNames(value).forEach(function (key) {
-              error[key] = value[key];
-          });
-  
-          return error;
-      }
-  
-      return value;
-    }
-    res.status(400).json({message: JSON.stringify(error)});
+    res.status(error.statusCode).json(error.stack); // stack includes the error msg and the stack trace
   });
 }
 
@@ -67,7 +54,9 @@ function readProfileFromDb(userId) {
 
       // Throw a not found exception if we couldn't find a profile
       if (typeof profile === 'undefined') {
-        reject(new DetailedError(1, `No profile found for userId: ${userId}`, new Error().stack));
+        const error = new Error(`No profile found for userId: ${userId}`);
+        error.statusCode = 400;
+        reject(error);
         return;
       }
 
