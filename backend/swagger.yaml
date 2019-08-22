@@ -11,18 +11,32 @@ consumes:
 # format of the responses to the client (Accepts)
 produces:
   - application/json
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-  responses:
-    UnauthorizedError:
-      description: Access token is missing or invalid
 security:
   - bearerAuth: []
 paths:
+  /users/register:
+    post:
+      description: Register a user account
+      operationId: registerUser
+      tags:
+        - authentication
+      security: []
+      parameters:
+        - name: user
+          in: body
+          description: The user object
+          required: true
+          schema:
+            $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: "#/components/schemas/AuthTokenResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   /like/{userId}:
     post:
       description: Add a like from one profile to another
@@ -40,140 +54,159 @@ paths:
           schema:
             type: string
         '401':
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: '#/components/schemas/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/components/schemas/ErrorResponse"
     delete:
       description: Unmatch a profile
       operationId: deleteLike
       parameters:
-        - name: userid
-          in: header
+        - name: userId
+          in: path
+          description: User ID to unlike
           required: true
-          type: string
-        - name: recipid
-          in: query
-          description: The userId to unlike.
-          required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: Success
           schema:
             type: string
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/components/schemas/ErrorResponse"
   /find:
     get:
       description: Returns a set of profiles fitting criteria for a profile id
       operationId: findProfiles
-      parameters:
-        - name: userid
-          in: header
-          required: true
-          type: string
       responses:
         "200":
           description: Success
           schema:
             type: array
             items:
-              $ref: "#/definitions/ProfileObject"
+              $ref: "#/components/schemas/ProfileObject"
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /profile:
+            $ref: "#/components/schemas/ErrorResponse"
+  /profile/{userId}:
     get:
       description: Returns a profile by id
       operationId: getProfile
       parameters:
-        - name: userid
-          in: header
+        - name: userId
+          in: path
+          description: User ID of the profile to retrieve
           required: true
-          type: string
-        - name: recipid
-          in: query
-          description: The id of the profile to retrieve
-          required: false
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: Success
           schema:
-            $ref: "#/definitions/ProfileObject"
+            $ref: "#/components/schemas/ProfileObject"
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/components/schemas/ErrorResponse"
+  /profile:
     post:
       description: Create a profile
       operationId: createProfile
       parameters:
-        - name: userid
-          in: header
-          required: true
-          type: string
         - name: profile
           in: body
-          description: The id of the profile to retrieve
+          description: The profile body
           required: true
           schema:
-            $ref: "#/definitions/ProfileObject"
+            $ref: "#/components/schemas/ProfileObject"
       responses:
         "201":
           description: Success
           schema:
             type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
-# complex objects have schema definitions
-definitions:
-  ProfileObject:
-    properties:
-      name:
-        type: string
-      dateOfBirth:
-        type: string
-        description: YYYY-MM-DD To be formatted by the frontend
-      occupation:
-        type: string
-      bio:
-        type: string
-      photos:
-        type: array
-        items:
+            $ref: "#/components/schemas/ErrorResponse"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      properties:
+        emailAddress:
           type: string
-      tags:
-        type: array
-        items:
+        password:
           type: string
-      location:
-        type: object
-        properties:
-          latitude:
-            type: number
-          longitude:
-            type: number
-      maxDistance:
-        type: number
-        description: In kilometers.
-      ageRange:
-        type: object
-        properties:
-          min:
-            type: number
-          max:
-            type: number
-  ErrorResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
+    ProfileObject:
+      properties:
+        name:
+          type: string
+        dateOfBirth:
+          type: string
+          description: YYYY-MM-DD To be formatted by the frontend
+        occupation:
+          type: string
+        bio:
+          type: string
+        photos:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+        maxDistance:
+          type: number
+          description: In kilometers.
+        ageRange:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+    AuthTokenResponse:
+      properties:
+        success:
+          type: string
+        token:
+          type: string
+    ErrorResponse:
+      properties:
+        statusCode:
+          type: integer
+        errorCode:
+          type: integer
+        errorMsg:
+          type: string
+        stackTrace:
+          type: string
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  
