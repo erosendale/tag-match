@@ -11,7 +11,7 @@ const { shuffle } = require('../helpers/utils');
 
 module.exports = findProfiles;
 
-function findProfiles(req, res) {
+function findProfiles(req, res, next) {
 
     // Get the user's profile first for their preferences
     readProfileFromDb(req.user.id)
@@ -22,9 +22,7 @@ function findProfiles(req, res) {
     .then(profiles => {
         res.json(profiles);
     })
-    .catch(error => {
-        res.status(500).json({message: JSON.stringify(error)});
-    });
+    .catch(next);
 }
 
 function find(profile) {
@@ -46,7 +44,6 @@ function find(profile) {
             resolve(resProfiles);
         })
         .catch(error => {
-            console.log(error);
             Neo4jConn.driver.close();
             reject(error);
         });
@@ -96,7 +93,6 @@ function findLikes(profile) {
             resolve(profiles);
         })
         .catch(error => {
-            console.log(error);
             session.close();
             reject(error);
         });
@@ -148,7 +144,6 @@ function findTags(profile) {
             resolve(profiles);
         })
         .catch(error => {
-            console.log(error);
             session.close();
             reject(error);
         });

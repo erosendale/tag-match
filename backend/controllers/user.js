@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const User = require('../models/user');
+const ErrorResponse = require('../helpers/ErrorResponse')
 const bcrypt = require('bcryptjs');
 
 require('dotenv').config();
@@ -11,37 +12,45 @@ const secret = process.env.SECRET || 'the default secret';
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
-router.post('/register', (req,res) => {
+router.post('/register', (req,res,next) => {
+   if (!validateUserParams(req.body, next)) return;
    User.findOne({emailAddress: req.body.emailAddress})
       .then(user => {
          if(user) {
-            let error = 'Email Address Exists in Database.';
-            return res.status(400).json(error);
+            next(new ErrorResponse(400, ErrorResponse.errorCodes.UserRegisterEmailAlreadyExists, 'Email address exists in database'));
+            return;
          } else {
             const newUser = new User({
                   emailAddress: req.body.emailAddress,
                   password: req.body.password
                });
                bcrypt.genSalt(10, (err, salt) => {
-                  if(err) throw err;
+                  if(err) {
+                     next(new ErrorResponse(500, ErrorResponse.errorCodes.UserRegisterBcryptError, 'User register bcrypt.genSalt error', err.stack));
+                     return;
+                  }
                   bcrypt.hash(newUser.password, salt, (err, hash) => {
-                     if(err) throw err;
+                     if(err) {
+                        next(new ErrorResponse(500, ErrorResponse.errorCodes.UserRegisterBcryptError, 'User register bcrypt.hash error', err.stack));
+                        return;
+                     }
                      newUser.password = hash;
                      newUser.save()
                      .then(user => res.json(user))
-                     .catch(err => res.status(400).json(err));
+                     .catch(next);
                   }
                );
             });
          }
       })
-      .catch(err => res.status(400).json(err));
+      .catch(next);
 });
 
-router.post('/login', (req,res) => {
-   const email = req.body.email;
+router.post('/login', (req,res,next) => {
+   if (!validateUserParams(req.body, next)) return;
+   const emailAddress = req.body.emailAddress;
    const password = req.body.password;   
-   User.findOne({ email })
+   User.findOne({ emailAddress: emailAddress })
       .then(user => {
          if (!user) {
             return res.status(404).json({ error: "No Account Found" });
@@ -57,8 +66,7 @@ router.post('/login', (req,res) => {
                      error: "Error signing token",
                      raw: err 
                   }); 
-                  res.json({ 
-                     success: true,
+                  res.json({
                      token: `Bearer ${token}` 
                   });
                });      
@@ -67,7 +75,19 @@ router.post('/login', (req,res) => {
             }
          });
       })
-      .catch(err => res.status(400).json(err));
-  });
+      .catch(next);
+});
 
-  module.exports = router;
+function validateUserParams(body, next) {
+   if (typeof body.emailAddress === 'undefined') {
+      next(new ErrorResponse(400, ErrorResponse.errorCodes.BadParameters, 'No email address provided'));
+      return false;
+   }
+   if (typeof body.password === 'undefined') {
+      next(new ErrorResponse(400, ErrorResponse.errorCodes.BadParameters, 'No password provided'));
+      return false;
+   }
+   return true;
+}
+
+module.exports = router;

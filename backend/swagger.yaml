@@ -21,22 +21,86 @@ paths:
       tags:
         - authentication
       security: []
-      parameters:
-        - name: user
-          in: body
-          description: The user object
-          required: true
-          schema:
-            $ref: "#/components/schemas/User"
+      requestBody:
+        description: The user object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
       responses:
         "201":
           description: Success
-          schema:
-            $ref: "#/components/schemas/AuthTokenResponse"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: The user ID
+                  emailAddress:
+                    type: string
+                    description: The email address
+                  password:
+                    type: string
+                    description: The hashed password
+                  __v:
+                    type: string
+                    description: Some user data
         default:
           description: Error
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: "#/components/responses/ErrorResponse"
+  /users/login:
+    post:
+      description: Log in with a user account to get an access token.
+      operationId: loginUser
+      tags:
+        - authentication
+      security: []
+      requestBody:
+        description: The user object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The JWT access token
+        default:
+          description: Error
+          schema:
+            $ref: "#/components/responses/ErrorResponse"
+  /users/me:
+    get:
+      description: Get the user account.
+      operationId: getUser
+      tags:
+        - authentication
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The user ID
+                  emailAddress:
+                    type: string
+                    descrition: The user's email address 
   /like/{userId}:
     post:
       description: Add a like from one profile to another
@@ -54,11 +118,11 @@ paths:
           schema:
             type: string
         '401':
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/responses/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: "#/components/responses/ErrorResponse"
     delete:
       description: Unmatch a profile
       operationId: deleteLike
@@ -75,11 +139,11 @@ paths:
           schema:
             type: string
         '401':
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/responses/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: "#/components/responses/ErrorResponse"
   /find:
     get:
       description: Returns a set of profiles fitting criteria for a profile id
@@ -92,11 +156,11 @@ paths:
             items:
               $ref: "#/components/schemas/ProfileObject"
         '401':
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/responses/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: "#/components/responses/ErrorResponse"
   /profile/{userId}:
     get:
       description: Returns a profile by id
@@ -114,22 +178,22 @@ paths:
           schema:
             $ref: "#/components/schemas/ProfileObject"
         '401':
-          $ref: '#/components/schemas/UnauthorizedError'
+          $ref: '#/components/responses/UnauthorizedError'
         default:
           description: Error
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: "#/components/responses/ErrorResponse"
   /profile:
     post:
       description: Create a profile
       operationId: createProfile
-      parameters:
-        - name: profile
-          in: body
-          description: The profile body
-          required: true
-          schema:
-            $ref: "#/components/schemas/ProfileObject"
+      requestBody:
+        description: The user object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileObject"
       responses:
         "201":
           description: Success
@@ -140,7 +204,7 @@ paths:
         default:
           description: Error
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: "#/components/responses/ErrorResponse"
 components:
   securitySchemes:
     bearerAuth:
@@ -190,12 +254,7 @@ components:
               type: number
             max:
               type: number
-    AuthTokenResponse:
-      properties:
-        success:
-          type: string
-        token:
-          type: string
+  responses:
     ErrorResponse:
       properties:
         statusCode:
@@ -204,9 +263,8 @@ components:
           type: integer
         errorMsg:
           type: string
-        stackTrace:
+        raw:
           type: string
-  responses:
     UnauthorizedError:
       description: Access token is missing or invalid
   

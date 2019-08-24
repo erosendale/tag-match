@@ -4,16 +4,14 @@
 const Neo4jConn = require('../helpers/Neo4j');
 var neo4j = require('neo4j-driver')
 const { isEmpty } = require('../helpers/utils');
-const DetailedError = require('../helpers/DetailedError');
+const ErrorResponse = require('../helpers/ErrorResponse');
 
 //const config = ConfigManager.getConfig('mongo');
-const collectionProfiles = 'profiles';
 
 const router = require('express').Router();
 
-router.route('/:userId')
-  .get(getProfile)
-  .post(createProfile);
+router.get('/:userId', getProfile);
+router.post('/', createProfile);
 
 module.exports = {
   routes: router,
@@ -51,8 +49,8 @@ function readProfileFromDb(userId) {
 
       // Throw a not found exception if we couldn't find a profile
       if (typeof profile === 'undefined') {
-        const error = new DetailedError(400,
-          DetailedError.errorCodes.ProfileNotFound, 
+        const error = new ErrorResponse(400,
+          ErrorResponse.errorCodes.ProfileNotFound, 
           `No profile found for userId: ${userId}`, 
           new Error().stack);
         reject(error);
@@ -66,7 +64,6 @@ function readProfileFromDb(userId) {
       resolve(profile);
     })
     .catch(error => {
-      console.log(error);
       reject(error);
     });
   })
@@ -77,17 +74,16 @@ function readProfileFromDb(userId) {
  * @param {*} req 
  * @param {*} res 
  */
-function createProfile(req, res, user) {
-   
-  const userId = req.user.id;
+function createProfile(req, res, next) {
+
   const profile = req.body;
 
   // Start a session with neo4j
   const session = Neo4jConn.driver.session();
   session
   .run(`
-  CREATE (p:Profile { 
-    userId : {userId},
+  MERGE (p:Profile {userId: {userId}})
+  SET p += { 
     name : {name},
     dateOfBirth : date({dateOfBirth}),
     occupation : {occupation},
@@ -97,14 +93,14 @@ function createProfile(req, res, user) {
     maxDistance : {maxDistance},
     ageRangeMin : {ageRangeMin},
     ageRangeMax : {ageRangeMax}  
-  })
+  }
   WITH p
   FOREACH (t IN {tags} |
     MERGE (tag:Tag {value: t})
     MERGE (p)-[:TAGGED]->(tag)
   )
   RETURN p.userId AS userId`, { // TODO: I want to merge one node to multiple tags here
-    userId: user.id,
+    userId: req.user.id,
     name: profile.name,
     dateOfBirth: profile.dateOfBirth,
     occupation: profile.occupation,
@@ -119,16 +115,12 @@ function createProfile(req, res, user) {
   })
   .subscribe({
     onNext: function(record) {
-      console.log(record.get('userId'));
     },
     onCompleted: function() {
       session.close();
       Neo4jConn.driver.close();
       res.json('success');
     },
-    onError: function(error) {
-      console.log(error);
-      res.status(500).json({message: JSON.stringify(error)});
-    }
+    onError: next
   });
 }

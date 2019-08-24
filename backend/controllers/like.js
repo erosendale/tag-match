@@ -3,13 +3,12 @@ const Neo4jConn = require('../helpers/Neo4j');
 const router = require('express').Router();
 
 router.route('/:userId')
-    .get(addLike)
+    .post(addLike)
     .delete(deleteLike);
 
 module.exports = router;
 
-function addLike(req,res) {
-
+function addLike(req,res,next) {
     const userId = req.user.id;
     const recipId = req.params.userId;
 
@@ -29,16 +28,12 @@ function addLike(req,res) {
             Neo4jConn.driver.close();
             res.json('success');
         },
-        onError: function(error) {
-            console.log(error);
-            res.status(500).json({message: JSON.stringify(error)});
-        }
+        onError: next
     });
 }
 
 // unmatch
-function deleteLike(req,res) {
-
+function deleteLike(req,res,next) {
     const userId = req.user.id;
     const recipId = req.params.userId;
 
@@ -62,9 +57,6 @@ function deleteLike(req,res) {
             Neo4jConn.driver.close();
             res.json('success');
         },
-        onError: function(error) {
-            console.log(error);
-            res.status(500).json({message: JSON.stringify(error)});
-        }
+        onError: next
     });
 }

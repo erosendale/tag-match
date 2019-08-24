@@ -52,16 +52,10 @@ app.use((req,res,next) => {
 
 // Routes
 router.use('/users', require('./controllers/user'));
+router.use('/users/me', passport.authenticate('jwt', {session: false}), (req, res) => res.json(req.user));
 router.use('/profile', passport.authenticate('jwt', {session: false}), require('./controllers/profile').routes);
 router.use('/find', passport.authenticate('jwt', {session: false}), require('./controllers/find'));
 router.use('/like', passport.authenticate('jwt', {session: false}), require('./controllers/like'));
-
-// router.use(function (err, req, res, next) {
-//   logger.error(err);
-//   if (!err.statusCode) err.statusCode = 500;
-//   res.status(err.statusCode).json({error: err});
-//   next();
-// })
 
 app.use('/api/v1', router);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -70,10 +64,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(function (err, req, res, next) {
   logger.error(err);
   if (!err.statusCode) err.statusCode = 500;
+  if (err.stack) err = {statusCode: err.statusCode, raw: err.stack} // handle default errors
   res.status(err.statusCode).json({error: err});
 });
-
-
 
 //registers our authentication routes with Express.
 app.listen(port, err => {

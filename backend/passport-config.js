@@ -22,13 +22,15 @@ module.exports = passport => {
             User.findById(payload.id)
                 .then(user => {
                     if(user){
-                    return done(null, {
-                        id: user.id,
-                        email: user.email,
-                    });
+                        return done(null, {
+                            id: user._id.toString(),
+                            emailAddress: user.emailAddress,
+                        });
                     }
                     return done(null, false);
-                }).catch(err => console.error(err));
+                }).catch(err => {
+                    return done(err, false);
+                });
             })
         );
     };

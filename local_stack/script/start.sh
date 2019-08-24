@@ -2,6 +2,7 @@
 docker-compose up -d
 
 # Wait until a cypher-shell command returns no error on it's stderr, so we know the db is ready
+echo "Waiting for neo4j..."
 while [ -n "$(docker exec -i local_stack_neo4j_1 cypher-shell -u neo4j -p test 'MATCH (n) RETURN n' 2>&1 > /dev/null)" ]; do
     printf "."
     sleep 0.1
