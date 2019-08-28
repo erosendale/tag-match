@@ -13,7 +13,7 @@ function addLike(req,res,next) {
     const recipId = req.params.userId;
 
     // Start a session with neo4j
-    const session = Neo4jConn.driver.session();
+    const session = Neo4jConn.session();
     session
     .run(`
     MATCH (p:Profile {userId: {userId}})
@@ -25,7 +25,7 @@ function addLike(req,res,next) {
     .subscribe({
         onCompleted: function() {
             session.close();
-            Neo4jConn.driver.close();
+            Neo4jConn.close();
             res.json('success');
         },
         onError: next
@@ -38,7 +38,7 @@ function deleteLike(req,res,next) {
     const recipId = req.params.userId;
 
     // Start a session with neo4j
-    const session = Neo4jConn.driver.session();
+    const session = Neo4jConn.session();
     session
     .run(`
     MATCH (p:Profile {userId: {userId}})
@@ -54,7 +54,7 @@ function deleteLike(req,res,next) {
     .subscribe({
         onCompleted: function() {
             session.close();
-            Neo4jConn.driver.close();
+            Neo4jConn.close();
             res.json('success');
         },
         onError: next

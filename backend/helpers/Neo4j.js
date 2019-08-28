@@ -12,7 +12,4 @@ const driver = neo4j.v1.driver(
 // Note: Always make sure to close sessions when you are done using them!
 //var session = driver.session();
 
-
-module.exports = {
-    driver
-};
+module.exports = driver;

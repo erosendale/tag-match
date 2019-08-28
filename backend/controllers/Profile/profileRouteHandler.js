@@ -1,10 +1,11 @@
 'use strict';
 
 //const ConfigManager = require('../helpers/ConfigManager');
-const Neo4jConn = require('../helpers/Neo4j');
+const Neo4jConn = require('../../helpers/Neo4j');
 var neo4j = require('neo4j-driver')
-const { isEmpty } = require('../helpers/utils');
-const ErrorResponse = require('../helpers/ErrorResponse');
+const { isEmpty } = require('../../helpers/utils');
+const ErrorResponse = require('../../helpers/ErrorResponse');
+const Profile = require('./Profile');
 
 //const config = ConfigManager.getConfig('mongo');
 
@@ -15,22 +16,22 @@ router.post('/', createProfile);
 
 module.exports = {
   routes: router,
-  readProfileFromDb
+  getProfileFromDb
 };
 
 function getProfile(req, res, next) {
   // Get the requested user profile
   const userId = req.params.userId;
-  readProfileFromDb(userId)
+  getProfileFromDb(userId)
   .then(profile => {
     res.json(profile);
   })
   .catch(next);
 }
 
-function readProfileFromDb(userId) {
+function getProfileFromDb(userId) {
   // Pull a profile from the db and return it
-  const session = Neo4jConn.driver.session();
+  const session = Neo4jConn.session();
   return new Promise((resolve, reject) => {
     session
     .run(`
@@ -41,6 +42,7 @@ function readProfileFromDb(userId) {
     .then(result => {
       let profile;
       const tags = [];
+      console.log(result.records);
       result.records.forEach(function(record) {
         profile = record.get('p').properties;
         profile.dateOfBirth = record.get('dob');
@@ -53,6 +55,9 @@ function readProfileFromDb(userId) {
           ErrorResponse.errorCodes.ProfileNotFound, 
           `No profile found for userId: ${userId}`, 
           new Error().stack);
+        
+        session.close();
+        Neo4jConn.close();
         reject(error);
         return;
       }
@@ -60,12 +65,10 @@ function readProfileFromDb(userId) {
       profile['tags'] = tags;
 
       session.close();
-      Neo4jConn.driver.close();
-      resolve(profile);
+      Neo4jConn.close();
+      resolve(Profile.fromNeo(profile));
     })
-    .catch(error => {
-      reject(error);
-    });
+    .catch(reject);
   })
 }
 
@@ -79,7 +82,7 @@ function createProfile(req, res, next) {
   const profile = req.body;
 
   // Start a session with neo4j
-  const session = Neo4jConn.driver.session();
+  const session = Neo4jConn.session();
   session
   .run(`
   MERGE (p:Profile {userId: {userId}})
@@ -113,14 +116,14 @@ function createProfile(req, res, next) {
     ageRangeMax: profile.ageRange.max,
     tags: profile.tags
   })
-  .subscribe({
-    onNext: function(record) {
-    },
-    onCompleted: function() {
+  .then(result => {
       session.close();
-      Neo4jConn.driver.close();
+      Neo4jConn.close();
       res.json('success');
-    },
-    onError: next
+  })
+  .catch(error => {
+      session.close();
+      Neo4jConn.close();
+      next(error);
   });
 }

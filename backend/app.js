@@ -53,7 +53,7 @@ app.use((req,res,next) => {
 // Routes
 router.use('/users', require('./controllers/user'));
 router.use('/users/me', passport.authenticate('jwt', {session: false}), (req, res) => res.json(req.user));
-router.use('/profile', passport.authenticate('jwt', {session: false}), require('./controllers/profile').routes);
+router.use('/profile', passport.authenticate('jwt', {session: false}), require('./controllers/Profile/profileRouteHandler').routes);
 router.use('/find', passport.authenticate('jwt', {session: false}), require('./controllers/find'));
 router.use('/like', passport.authenticate('jwt', {session: false}), require('./controllers/like'));
 

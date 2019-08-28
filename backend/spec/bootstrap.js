@@ -2,27 +2,29 @@ const request = require('supertest');
 const app = require('../app');
 const uniqid = require('uniqid');
 
-const uniqueUserSuffix = uniqid();
-const user = {
-  emailAddress : `test.user.${uniqueUserSuffix}@fake.com`,
-  password : "password"
-};
+async function doLogin(count=1) {
+  const res = [];
+  for (let i = 0; i < count; i++) {
+    const uniqueUserSuffix = uniqid();
+    const user = {
+      emailAddress : `test.user.${uniqueUserSuffix}@fake.com`,
+      password : "password"
+    };
 
-const authenticatedUser = {};
+    const userId = await register(user);
+    const accessToken = await login(user);
+    res.push({
+      userId,
+      accessToken
+    });
+  }
 
-async function doLogin() {
-  const userId = await register();
-  const accessToken = await login();
-
-  return {
-    userId,
-    accessToken
-  };
+  return res;
 }
 
 module.exports = doLogin;
 
-function register() {
+function register(user) {
   return new Promise((resolve, reject) => {
     request(app)
       .post('/api/v1/users/register')
@@ -40,7 +42,7 @@ function register() {
   });
 }
 
-function login() {
+function login(user) {
   return new Promise((resolve, reject) => {
     request(app)
     .post('/api/v1/users/login')
@@ -49,7 +51,6 @@ function login() {
     .end(function(err, res) {
       expect('Content-Type', 'application/json; charset=utf-8')
       expect(res.status).toEqual(200);
-      expect(res.body.success).toBeDefined();
       expect(res.body.token).toBeDefined();
       expect(err).toBeNull();
       resolve(res.body.token);

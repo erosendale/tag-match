@@ -37,7 +37,6 @@ describe ('auth tests', function() {
         expect('Content-Type', 'application/json; charset=utf-8')
         expect(res.status).toEqual(200);
 
-        expect(res.body.success).toBeDefined();
         expect(res.body.token).toBeDefined();
 
         expect(err).toBeNull();
