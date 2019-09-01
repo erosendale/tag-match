@@ -39,6 +39,10 @@ pipeline {
         branch 'master'
       }
       steps {
+        dir('local_stack/') {
+          sh 'script/build.sh'
+          sh 'script/start.sh'
+        }
         dir('backend/') {
           container('nodejs') {
 
@@ -56,6 +60,9 @@ pipeline {
             sh "export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml"
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
           }
+        }
+        dir('local_stack/') {
+          sh 'script/stop.sh'
         }
       }
     }
