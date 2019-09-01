@@ -40,8 +40,8 @@ pipeline {
       }
       steps {
         dir('local_stack/') {
-          sh 'script/build.sh'
-          sh 'script/start.sh'
+          sh 'sh script/build.sh'
+          sh 'sh script/start.sh'
         }
         dir('backend/') {
           container('nodejs') {
@@ -62,7 +62,7 @@ pipeline {
           }
         }
         dir('local_stack/') {
-          sh 'script/stop.sh'
+          sh 'sh script/stop.sh'
         }
       }
     }
