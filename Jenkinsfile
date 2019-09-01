@@ -40,7 +40,6 @@ pipeline {
       }
       steps {
         dir('local_stack/') {
-          sh 'sh script/build.sh'
           sh 'sh script/start.sh'
         }
         dir('backend/') {
