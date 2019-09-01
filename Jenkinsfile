@@ -40,6 +40,8 @@ pipeline {
       }
       steps {
         dir('local_stack/') {
+          sh 'sudo curl -L --fail https://github.com/docker/compose/releases/download/1.24.1/run.sh -o /usr/local/bin/docker-compose'
+          sh 'sudo chmod +x /usr/local/bin/docker-compose'
           sh 'sh script/start.sh'
         }
         dir('backend/') {
