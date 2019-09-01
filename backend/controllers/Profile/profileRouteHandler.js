@@ -1,13 +1,8 @@
 'use strict';
 
-//const ConfigManager = require('../helpers/ConfigManager');
 const Neo4jConn = require('../../helpers/Neo4j');
-var neo4j = require('neo4j-driver')
-const { isEmpty } = require('../../helpers/utils');
 const ErrorResponse = require('../../helpers/ErrorResponse');
 const Profile = require('./Profile');
-
-//const config = ConfigManager.getConfig('mongo');
 
 const router = require('express').Router();
 
@@ -42,7 +37,6 @@ function getProfileFromDb(userId) {
     .then(result => {
       let profile;
       const tags = [];
-      console.log(result.records);
       result.records.forEach(function(record) {
         profile = record.get('p').properties;
         profile.dateOfBirth = record.get('dob');

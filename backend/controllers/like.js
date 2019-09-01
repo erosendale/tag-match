@@ -1,3 +1,5 @@
+'use strict';
+
 const Neo4jConn = require('../helpers/Neo4j');
 
 const router = require('express').Router();

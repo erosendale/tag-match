@@ -1,14 +1,10 @@
 'use strict';
 
-//const ConfigManager = require('../helpers/ConfigManager');
 const { getProfileFromDb } = require('./Profile/profileRouteHandler');
 const Neo4jConn = require('../helpers/Neo4j');
 const neo4j = require('neo4j-driver');
 const { shuffle } = require('../helpers/utils');
 const Profile = require('./Profile/Profile');
-
-// const config = ConfigManager.getConfig('mongo');
-// const collectionProfiles = 'profiles';
 
 module.exports = findProfiles;
 
