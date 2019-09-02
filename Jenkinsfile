@@ -19,6 +19,11 @@ pipeline {
         HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
       }
       steps {
+        dir('local_stack/') {
+          container('docker-compose') {
+            sh 'sh script/start.sh' 
+          }
+        }
         dir('backend/') {
           container('nodejs') {
             sh "jx step credential -s npm-token -k file -f /builder/home/.npmrc --optional=true"
@@ -30,6 +35,11 @@ pipeline {
               sh "make preview"
               sh "jx preview --app $APP_NAME --dir ../.."
             }
+          }
+        }
+        dir('local_stack/') {
+          container('docker-compose') {
+            sh 'sh script/stop.sh'
           }
         }
       }
