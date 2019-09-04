@@ -19,7 +19,7 @@ require('dotenv').config();
 const app = express();
 
 const port = process.env.PORT || 3000;
-const dbUrl = process.env.DB_URL || "tag-match-mongo";
+const dbUrl = process.env.DB_URL || "localhost";
 const dbCollection = process.env.DB_COLLECTION || "auth-test";
 const dbUsername = process.env.DB_USERNAME || "root";
 const dbPassword = process.env.DB_PASSWORD || "password";
