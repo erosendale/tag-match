@@ -20,9 +20,9 @@ pipeline {
       }
       steps {
         container('nodejs') {
-          dir('local_stack/') {
-            sh 'sh script/start.sh' 
-          }
+          // dir('local_stack/') {
+          //   sh 'sh script/start.sh' 
+          // }
           dir('backend/') {
             sh "jx step credential -s npm-token -k file -f /builder/home/.npmrc --optional=true"
             sh "npm install"
@@ -34,9 +34,9 @@ pipeline {
               sh "jx preview --app $APP_NAME --dir ../.."
             }
           }
-          dir('local_stack/') {
-            sh 'sh script/stop.sh'
-          }
+          // dir('local_stack/') {
+          //   sh 'sh script/stop.sh'
+          // }
         }
       }
     }
