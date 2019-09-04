@@ -48,8 +48,8 @@ pipeline {
         container('nodejs') {
           dir('local_stack/') {
             sh 'sh script/start.sh'
-            sh 'lsof -i tcp:7687'
-            sh 'lsof -i tcp:27017' 
+            sh 'echo `lsof -i tcp:7687`'
+            sh 'echo `lsof -i tcp:27017`' 
           }
           dir('backend/') {
             // ensure we're not on a detached head
