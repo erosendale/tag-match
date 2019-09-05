@@ -50,7 +50,7 @@ app.use((req,res,next) => {
 });
 
 // Readiness probe
-app.use('/', (err, req, res) => { res.json('success') });
+app.get('/', (req, res) => res.send('success'));
 
 // Routes
 router.use('/users', require('./controllers/user'));
