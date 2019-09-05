@@ -49,6 +49,9 @@ app.use((req,res,next) => {
   next();
 });
 
+// Readiness probe
+app.use('/', (err, req, res) => { res.json('success') });
+
 // Routes
 router.use('/users', require('./controllers/user'));
 router.use('/users/me', passport.authenticate('jwt', {session: false}), (req, res) => res.json(req.user));
