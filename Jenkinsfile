@@ -20,23 +20,17 @@ pipeline {
       }
       steps {
         container('nodejs') {
-          // dir('local_stack/') {
-          //   sh 'sh script/start.sh' 
-          // }
           dir('backend/') {
             sh "jx step credential -s npm-token -k file -f /builder/home/.npmrc --optional=true"
             sh "npm install"
             sh "CI=true DISPLAY=:99 npm test"
             sh "export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml"
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
-            dir('../charts/preview') {
+            dir('charts/preview') {
               sh "make preview"
               sh "jx preview --app $APP_NAME --dir ../.."
             }
           }
-          // dir('local_stack/') {
-          //   sh 'sh script/stop.sh'
-          // }
         }
       }
     }
