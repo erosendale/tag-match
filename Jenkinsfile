@@ -40,11 +40,6 @@ pipeline {
       }
       steps {
         container('nodejs') {
-          dir('local_stack/') {
-            sh 'sh script/start.sh'
-            sh 'echo `lsof -i tcp:7687`'
-            sh 'echo `lsof -i tcp:27017`' 
-          }
           dir('backend/') {
             // ensure we're not on a detached head
             sh "git checkout master"
@@ -60,9 +55,6 @@ pipeline {
             sh "export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml"
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
           }
-          dir('local_stack/') {
-            sh 'sh script/stop.sh'
-          }
         }
       }
     }
@@ -72,7 +64,7 @@ pipeline {
       }
       steps {
         container('nodejs') {
-          dir('../charts/tag-match') {
+          dir('backend/charts/tag-match') {
             sh "jx step changelog --batch-mode --version v\$(cat ../../VERSION)"
 
             // release the helm chart
