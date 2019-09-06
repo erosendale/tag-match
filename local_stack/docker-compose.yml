@@ -10,6 +10,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+    container_name: tag-match-mongo
 
   mongo-express:
     image: mongo-express
@@ -28,3 +29,4 @@ services:
       - 7687:7687
     environment: #To remove password requirement 
       NEO4J_AUTH: neo4j/test
+    container_name: tag-match-neo

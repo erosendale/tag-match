@@ -5,7 +5,7 @@ const neo4j = require('neo4j-driver');
 require('dotenv').config();
 // reads in configuration from a .env file
 
-const dbUrl = process.env.DB_URL || "neo4j";
+const dbUrl = process.env.DB_URL || "127.0.0.1";
 const dbUsername = process.env.DB_USERNAME || "neo4j";
 const dbPassword = process.env.DB_PASSWORD || "test";
 

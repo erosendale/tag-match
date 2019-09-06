@@ -4,6 +4,7 @@
   "description": "Tag matching app using Neo4j",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "jasmine"
   },
   "author": "Eric Rosendale",
