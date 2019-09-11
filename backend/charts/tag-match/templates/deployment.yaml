@@ -24,8 +24,23 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
-{{- range .Values.env }}
-  - {{ . }}
+{{- range $pkey, $pval := .Values.env }}
+        - name: {{ $pkey }}
+          value: {{ quote $pval }}
+{{- end }}
+{{- range $pkey, $pval := .Values.envSecretsUsernames }}
+        - name: {{ $pkey }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ quote $pval }}
+              key: username
+{{- end }}
+{{- range $pkey, $pval := .Values.envSecretsPasswords }}
+        - name: {{ $pkey }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ quote $pval }}
+              key: password
 {{- end }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
