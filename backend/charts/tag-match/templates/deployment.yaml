@@ -24,8 +24,8 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
-{{- range $index, $var := .Values.env }}
-  {{ $var }}
+{{- range .Values.env }}
+  - {{ . }}
 {{- end }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
