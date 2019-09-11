@@ -24,6 +24,32 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+          - name: MONGO_URL
+            value: mongodb.staging.tag-match.com
+          - name: MONGO_AUTH_DB
+            value: auth
+          - name: MONGO_AUTH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongo-auth
+                key: username
+          - name: MONGO_AUTH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongo-auth
+                key: password
+          - name: NEO4J_URL
+            value: neo4j.staging.tag-match.com
+          - name: NEO4J_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: neo-user
+                key: username
+          - name: NEO4J_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: neo-user
+                key: password
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
