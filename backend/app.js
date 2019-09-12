@@ -28,6 +28,8 @@ mongoose.set('useCreateIndex', true);
 
 mongoose.connect(`mongodb://${dbUsername}:${dbPassword}@${dbUrl}/${dbCollection}?authSource=admin&w=1`, { 
   useNewUrlParser: true //fixes an issue with a depricated default in Mongoose.js
+}).catch(err => {
+  console.log("Not Connected to Database ERROR! ", err);
 });
   
 app.use(passport.initialize());
