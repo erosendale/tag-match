@@ -9,6 +9,17 @@ image:
 
 # define environment variables here as a map of key: value
 env:
+  MONGO_URL: mongodb.staging.tag-match.com
+  MONGO_AUTH_DB: auth
+  NEO4J_URL: neo4j.staging.tag-match.com
+
+envSecretsUsernames:
+  MONGO_AUTH_USERNAME: mongo-auth
+  NEO4J_USERNAME: neo-user
+
+envSecretsPasswords:
+  MONGO_AUTH_PASSWORD: mongo-auth
+  NEO4J_PASSWORD: neo-user
 
 # enable this flag to use knative serve to deploy the app
 knativeDeploy: false

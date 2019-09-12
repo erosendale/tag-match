@@ -1,3 +1,3 @@
-CREATE INDEX ON :Profile(userId, location, dateOfBirth, liked);
+CREATE INDEX ON :Profile(userId, location, dateOfBirth);
 
 CREATE INDEX ON :Tag(value);
