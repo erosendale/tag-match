@@ -11,6 +11,60 @@ const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express'),
     swaggerDocument = YAML.load('./swagger.yaml');
 
+
+
+
+    function healthcheck() {
+      console.log('inside healthcheck');
+      const session = neo.session();
+  
+      return new Promise((resolve, reject) => {
+          console.log('promise query');
+          session
+          .run(`MATCH (n)
+          RETURN n`)
+          .subscribe({
+            onCompleted: function() {
+                session.close();
+                neo.close();
+                resolve('success');
+            },
+            onError: function(err) {
+              session.close();
+              neo.close();
+              reject(err);
+            }
+          });
+          // .then(result => {
+          //   console.log(`result: ${result}`);
+      
+          //   // Throw a not found exception if we couldn't find a profile
+          // //   if (typeof profile === 'undefined') {
+          // //     const error = new ErrorResponse(400,
+          // //       ErrorResponse.errorCodes.ProfileNotFound, 
+          // //       `No profile found for userId: ${userId}`, 
+          // //       new Error().stack);
+              
+          // //     session.close();
+          // //     Neo4jConn.close();
+          // //     reject(error);
+          // //     return;
+          // //   }
+      
+          //   session.close();
+          //   neo.close();
+          //   resolve('success');
+          // })
+          // .catch(err => {
+          //     session.close();
+          //     neo.close();
+          //     console.log(`error: ${err}`);
+          //     reject(err);
+          // });
+      });
+  }
+
+
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
 
@@ -42,11 +96,23 @@ app.use((req,res,next) => {
 });
 
 // Readiness probe
-app.get('/up', (req, res) => {
-  mongo.getConnection();
+app.get('/up', async (req, res) => {
+  const connection = await mongo.getConnection();
+  if (connection != 'success') res.status(500).send(connection);
 
-  const session = neo.session();
-  session.close();
+  console.log('call healthcheck');
+  healthcheck()
+  .then((res) => {
+    console.log(res);
+  })
+  .catch((err) => {
+    console.log(err);
+    res.status(500).send(err);
+    return;
+  });
+
+  // const session = neo.session();
+  // session.close();
   
   res.send('success');
 });

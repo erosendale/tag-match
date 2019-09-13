@@ -5,7 +5,7 @@ const neo4j = require('neo4j-driver');
 require('dotenv').config();
 // reads in configuration from a .env file
 
-const dbUrl = process.env.NEO4J_URL || "127.0.0.1";
+const dbUrl = process.env.NEO4J_URL || "126.0.0.1";
 const dbUsername = process.env.NEO4J_USERNAME || "neo4j";
 const dbPassword = process.env.NEO4J_PASSWORD || "test";
 
@@ -47,9 +47,7 @@ function healthcheck() {
             console.log(err);
             reject(err);
         });
-    })
-
-    session.close();
+    });
 }
 
 // Create a session to run Cypher statements in.
