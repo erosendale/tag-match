@@ -15,6 +15,43 @@ const driver = neo4j.v1.driver(
     neo4j.v1.auth.basic(dbUsername, dbPassword)
 );
 
+function healthcheck() {
+    const session = driver.session();
+
+    return new Promise((resolve, reject) => {
+        session
+        .run(`CALL db.indexes`)
+        .then(result => {
+          console.log(result);
+    
+          // Throw a not found exception if we couldn't find a profile
+        //   if (typeof profile === 'undefined') {
+        //     const error = new ErrorResponse(400,
+        //       ErrorResponse.errorCodes.ProfileNotFound, 
+        //       `No profile found for userId: ${userId}`, 
+        //       new Error().stack);
+            
+        //     session.close();
+        //     Neo4jConn.close();
+        //     reject(error);
+        //     return;
+        //   }
+    
+          session.close();
+          Neo4jConn.close();
+          resolve('success');
+        })
+        .catch(err => {
+            session.close();
+            Neo4jConn.close();
+            console.log(err);
+            reject(err);
+        });
+    })
+
+    session.close();
+}
+
 // Create a session to run Cypher statements in.
 // Note: Always make sure to close sessions when you are done using them!
 //var session = driver.session();

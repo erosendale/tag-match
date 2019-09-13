@@ -4,8 +4,6 @@ require('dotenv').config();
 
 const secret = process.env.SECRET || 'the default secret';
 
-const mongoose = require('mongoose');
-
 const User = require('./models/user');
 
 const opts = {
