@@ -46,13 +46,13 @@ app.use((req,res,next) => {
 app.get('/up', async (req, res) => {
   try {
     await mongo.getConnection()
-  } catch (e) {
+  } catch (error) {
     res.status(500).send(error);
   }
 
   try {
     await Neo4jConn.healthcheck()
-  } catch (e) {
+  } catch (error) {
     res.status(500).send(error);
   }
 
