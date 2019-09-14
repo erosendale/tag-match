@@ -5,7 +5,7 @@ const neo4j = require('neo4j-driver');
 require('dotenv').config();
 // reads in configuration from a .env file
 
-const dbUrl = process.env.NEO4J_URL || "126.0.0.1";
+const dbUrl = process.env.NEO4J_URL || "127.0.0.1";
 const dbUsername = process.env.NEO4J_USERNAME || "neo4j";
 const dbPassword = process.env.NEO4J_PASSWORD || "test";
 
@@ -15,38 +15,40 @@ const driver = neo4j.v1.driver(
     neo4j.v1.auth.basic(dbUsername, dbPassword)
 );
 
+const indexes = [];
+function addIndexes() {
+    indexes.concat(arguments);
+}
+
 function healthcheck() {
     const session = driver.session();
 
     return new Promise((resolve, reject) => {
         session
-        .run(`CALL db.indexes`)
+        .run(`CALL db.indexes()`)
         .then(result => {
-          console.log(result);
-    
-          // Throw a not found exception if we couldn't find a profile
-        //   if (typeof profile === 'undefined') {
-        //     const error = new ErrorResponse(400,
-        //       ErrorResponse.errorCodes.ProfileNotFound, 
-        //       `No profile found for userId: ${userId}`, 
-        //       new Error().stack);
-            
-        //     session.close();
-        //     Neo4jConn.close();
-        //     reject(error);
-        //     return;
-        //   }
-    
           session.close();
-          Neo4jConn.close();
-          resolve('success');
+          driver.close();
+
+          let foundIndexes = 0;
+          result.records.forEach(record => {
+            const index = record.get('description');
+            if (indexes.includes(index)) {
+              foundIndexes += 1;
+            }
+          });
+
+          if (foundIndexes >= indexes.length) {
+            resolve('success');
+          } else {
+            reject(err);
+          }
         })
         .catch(err => {
-            session.close();
-            Neo4jConn.close();
-            console.log(err);
-            reject(err);
-        });
+          session.close();
+          driver.close();
+          reject(err);
+        })
     });
 }
 
@@ -54,4 +56,8 @@ function healthcheck() {
 // Note: Always make sure to close sessions when you are done using them!
 //var session = driver.session();
 
-module.exports = driver;
+module.exports = { 
+    driver,
+    addIndexes, 
+    healthcheck 
+}

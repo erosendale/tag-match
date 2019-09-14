@@ -52,20 +52,20 @@ describe('Find tests', function() {
     users = await require('./bootstrap')(3);
 
     // Clear neo4j before we start to clear profiles from previous sessions
-    let session = await Neo4jConn.session();
+    let session = await Neo4jConn.driver.session();
     await session.run(`
       MATCH (n)
       DETACH DELETE n`);
     session.close();
 
-    session = await Neo4jConn.session();
+    session = await Neo4jConn.driver.session();
     let res = await session.run(`
       MATCH (n)
       RETURN n`);
     expect(res.records).toEqual([]);
     session.close();
 
-    Neo4jConn.close();
+    Neo4jConn.driver.close();
     done();
   })
 

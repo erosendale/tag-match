@@ -10,10 +10,9 @@ describe('Healthcheck tests', function() {
       .end(function(err, res) {
         expect('Content-Type', 'application/json; charset=utf-8')
         expect(res.status).toEqual(200);
-        console.log(`healthcheck res ${JSON.stringify(res.body)}`);
 
         expect(err).toBeNull();
         done();
       });
-  });
+  }, 10000);
 })

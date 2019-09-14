@@ -4,6 +4,12 @@ const Neo4jConn = require('../../helpers/Neo4j');
 const ErrorResponse = require('../../helpers/ErrorResponse');
 const Profile = require('./Profile');
 
+// Add the indexes that we want in neo to the healthcheck
+const profileIndex = 'INDEX ON :Profile(userId, location, dateOfBirth)';
+const tagIndex = 'INDEX ON :Tag(value)';
+const indexes = [profileIndex, tagIndex];
+Neo4jConn.addIndexes(indexes);
+
 const router = require('express').Router();
 
 router.get('/:userId', getProfile);
@@ -26,7 +32,7 @@ function getProfile(req, res, next) {
 
 function getProfileFromDb(userId) {
   // Pull a profile from the db and return it
-  const session = Neo4jConn.session();
+  const session = Neo4jConn.driver.session();
   return new Promise((resolve, reject) => {
     session
     .run(`
@@ -51,7 +57,7 @@ function getProfileFromDb(userId) {
           new Error().stack);
         
         session.close();
-        Neo4jConn.close();
+        Neo4jConn.driver.close();
         reject(error);
         return;
       }
@@ -59,10 +65,14 @@ function getProfileFromDb(userId) {
       profile['tags'] = tags;
 
       session.close();
-      Neo4jConn.close();
+      Neo4jConn.driver.close();
       resolve(Profile.fromNeo(profile));
     })
-    .catch(reject);
+    .catch(error => {
+      session.close();
+      Neo4jConn.driver.close();
+      reject(error);
+    });
   })
 }
 
@@ -76,7 +86,7 @@ function createProfile(req, res, next) {
   const profile = req.body;
 
   // Start a session with neo4j
-  const session = Neo4jConn.session();
+  const session = Neo4jConn.driver.session();
   session
   .run(`
   MERGE (p:Profile {userId: {userId}})
@@ -112,12 +122,12 @@ function createProfile(req, res, next) {
   })
   .then(result => {
       session.close();
-      Neo4jConn.close();
+      Neo4jConn.driver.close();
       res.json('success');
   })
   .catch(error => {
       session.close();
-      Neo4jConn.close();
+      Neo4jConn.driver.close();
       next(error);
   });
 }

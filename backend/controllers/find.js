@@ -31,7 +31,7 @@ function find(profile) {
     return new Promise((resolve, reject) => {
         Promise.all([likesPromise, findPromise]).then(function(values) {
             // We're done now so close the driver
-            Neo4jConn.close();
+            Neo4jConn.driver.close();
 
             // Returns 2 lists of profiles
             // Shuffle them together so the likes aren't at the top
@@ -41,7 +41,7 @@ function find(profile) {
             resolve(resProfiles);
         })
         .catch(error => {
-            Neo4jConn.close();
+            Neo4jConn.driver.close();
             reject(error);
         });
     });
@@ -51,7 +51,7 @@ function find(profile) {
 function findLikes(profile) {
 
     // Start a session with neo4j
-    const session = Neo4jConn.session();
+    const session = Neo4jConn.driver.session();
 
     // We want to show any profiles that like the user as long as they are within age range
     // We don't care about distance because they could have been nearby when the like was made
@@ -86,7 +86,7 @@ function findLikes(profile) {
 function findTags(profile) {
 
     // Start a session with neo4j
-    const session = Neo4jConn.session();
+    const session = Neo4jConn.driver.session();
 
     // We will exclude likes here because we pull them seperately
     return new Promise((resolve, reject) => {
