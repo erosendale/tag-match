@@ -44,12 +44,8 @@ app.use((req,res,next) => {
 
 // Readiness probe
 app.get('/up', async (req, res) => {
-  const mongoConnection = await mongo.getConnection();
-  if (mongoConnection != 'success') res.status(500).send(mongoConnection);
-
-  const neoConnection = await Neo4jConn.healthcheck();
-  if (neoConnection != 'success') res.status(500).send(neoConnection);
-  
+  await mongo.getConnection().catch(error => res.status(500).send(error));
+  await Neo4jConn.healthcheck().catch(error => res.status(500).send(error));  
   res.send('success');
 });
 
