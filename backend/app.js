@@ -3,12 +3,14 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
-const mongoose = require('mongoose');
 const logger = require('./helpers/logger');
+const mongo = require('./helpers/Mongodb');
+const Neo4jConn = require('./helpers/Neo4j');
 const { isEmpty } = require('./helpers/utils');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express'),
     swaggerDocument = YAML.load('./swagger.yaml');
+
 
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
@@ -18,19 +20,8 @@ require('dotenv').config();
 
 const app = express();
 
-const port = process.env.PORT || 3000;
-const dbUrl = process.env.MONGO_URL || "127.0.0.1";
-const dbCollection = process.env.MONGO_AUTH_DB || "auth";
-const dbUsername = process.env.MONGO_AUTH_USERNAME || "root";
-const dbPassword = process.env.MONGO_AUTH_PASSWORD || "password";
-//sets the required variables from Environment Variables.
-mongoose.set('useCreateIndex', true);
-
-mongoose.connect(`mongodb://${dbUsername}:${dbPassword}@${dbUrl}/${dbCollection}?authSource=admin&w=1`, { 
-  useNewUrlParser: true //fixes an issue with a depricated default in Mongoose.js
-}).catch(err => {
-  console.log("Not Connected to Database ERROR! ", err);
-});
+// Establish a connection to mongodb
+mongo.getConnection();
   
 app.use(passport.initialize());
 // initializes the passport configuration
@@ -52,7 +43,23 @@ app.use((req,res,next) => {
 });
 
 // Readiness probe
-app.get('/', (req, res) => res.send('success'));
+app.get('/up', async (req, res) => {
+  try {
+    await mongo.getConnection();
+  } catch (error) {
+    res.status(500).send(error);
+    return;
+  }
+
+  try {
+    await Neo4jConn.healthcheck();
+  } catch (error) {
+    res.status(500).send(error);
+    return;
+  }
+
+  res.send('success');
+});
 
 // Routes
 router.use('/users', require('./controllers/user'));
@@ -73,6 +80,7 @@ app.use(function (err, req, res, next) {
 });
 
 //registers our authentication routes with Express.
+const port = process.env.PORT || 3000;
 app.listen(port, err => {
   if(err) console.error(err);
   console.log(`Listening for Requests on port: ${port}`);
