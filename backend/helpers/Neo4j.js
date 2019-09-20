@@ -11,8 +11,9 @@ const dbPassword = process.env.NEO4J_PASSWORD || "test";
 
 const driver = neo4j.v1.driver(
     `bolt://${dbUrl}`,
-    //{ disableLosslessIntegers: true } This doesn't work at all
-    neo4j.v1.auth.basic(dbUsername, dbPassword)
+    neo4j.v1.auth.basic(dbUsername, dbPassword),
+    { connectionTimeout: 2000,
+    disableLosslessIntegers: true }
 );
 
 const indexes = [];
