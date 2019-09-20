@@ -47,15 +47,15 @@ app.get('/up', async (req, res) => {
   try {
     await mongo.getConnection();
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
-    return;
   }
 
   try {
     await Neo4jConn.healthcheck();
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
-    return;
   }
 
   res.send('success');

@@ -16,9 +16,8 @@ function getConnection() {
         .then(() => {
             resolve('success');
         })
-        .catch(err => {
-            const errorResponse = `Not Connected to Database ERROR! ${err}`;
-            reject(errorResponse);
+        .catch(error => {
+            reject(error);
         });
     });
 }
