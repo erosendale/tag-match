@@ -10,7 +10,7 @@ const { isEmpty } = require('./helpers/utils');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express'),
     swaggerDocument = YAML.load('./swagger.yaml');
-
+const cors = require('cors');
 
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
@@ -19,6 +19,9 @@ require('dotenv').config();
 // reads in configuration from a .env file
 
 const app = express();
+
+// Enable cors
+app.use(cors());
 
 // Establish a connection to mongodb
 mongo.getConnection();
