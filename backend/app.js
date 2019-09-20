@@ -50,9 +50,12 @@ app.get('/up', async (req, res) => {
   try {
     await mongo.getConnection();
   } catch (error) {
+    mongo.disconnect();
     console.error(error);
     res.status(500).send(error);
   }
+
+  mongo.disconnect();
 
   try {
     await Neo4jConn.healthcheck();

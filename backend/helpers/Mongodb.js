@@ -22,4 +22,8 @@ function getConnection() {
     });
 }
 
-module.exports = { getConnection }
+function disconnect() {
+    mongoose.disconnect;
+}
+
+module.exports = { getConnection, disconnect }
