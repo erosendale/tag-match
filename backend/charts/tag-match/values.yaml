@@ -42,10 +42,10 @@ resources:
 probePath: /up
 livenessProbe:
   initialDelaySeconds: 60
-  periodSeconds: 10
+  periodSeconds: 20
   successThreshold: 1
-  timeoutSeconds: 1
+  timeoutSeconds: 2
 readinessProbe:
-  periodSeconds: 10
+  periodSeconds: 20
   successThreshold: 1
-  timeoutSeconds: 1
+  timeoutSeconds: 2

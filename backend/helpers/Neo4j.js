@@ -12,7 +12,7 @@ const dbPassword = process.env.NEO4J_PASSWORD || "test";
 const driver = neo4j.v1.driver(
     `bolt://${dbUrl}`,
     neo4j.v1.auth.basic(dbUsername, dbPassword),
-    { connectionTimeout: 2000,
+    { connectionTimeout: 1800,
     disableLosslessIntegers: true }
 );
 

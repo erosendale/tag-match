@@ -11,7 +11,7 @@ function getConnection() {
     return new Promise((resolve, reject) => {
         mongoose.connect(`mongodb://${dbUsername}:${dbPassword}@${dbUrl}/${dbCollection}?authSource=admin&w=1`, { 
             useNewUrlParser: true, //fixes an issue with a depricated default in Mongoose.js
-            connectTimeoutMS: 2000 //The default is 30 secs! Crazy!
+            connectTimeoutMS: 1800 //The default is 30 secs! Crazy!
         })
         .then(() => {
             resolve('success');
