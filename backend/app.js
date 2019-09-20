@@ -80,7 +80,7 @@ app.use(function (err, req, res, next) {
 });
 
 //registers our authentication routes with Express.
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 app.listen(port, err => {
   if(err) console.error(err);
   console.log(`Listening for Requests on port: ${port}`);
