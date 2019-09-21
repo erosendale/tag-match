@@ -10,7 +10,7 @@ const { isEmpty } = require('./helpers/utils');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express'),
     swaggerDocument = YAML.load('./swagger.yaml');
-
+const cors = require('cors');
 
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
@@ -19,6 +19,16 @@ require('dotenv').config();
 // reads in configuration from a .env file
 
 const app = express();
+
+// Enable cors
+app.use(cors());
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Methods", "GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, api_key, Authorization");
+  next();
+});
 
 // Establish a connection to mongodb
 mongo.getConnection();
@@ -47,15 +57,18 @@ app.get('/up', async (req, res) => {
   try {
     await mongo.getConnection();
   } catch (error) {
+    mongo.disconnect();
+    console.error(error);
     res.status(500).send(error);
-    return;
   }
+
+  mongo.disconnect();
 
   try {
     await Neo4jConn.healthcheck();
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
-    return;
   }
 
   res.send('success');
@@ -80,7 +93,7 @@ app.use(function (err, req, res, next) {
 });
 
 //registers our authentication routes with Express.
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 app.listen(port, err => {
   if(err) console.error(err);
   console.log(`Listening for Requests on port: ${port}`);
