@@ -10,7 +10,6 @@ const { isEmpty } = require('./helpers/utils');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express'),
     swaggerDocument = YAML.load('./swagger.yaml');
-const cors = require('cors');
 
 // tutorial
 // https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
@@ -21,11 +20,9 @@ require('dotenv').config();
 const app = express();
 
 // Enable cors
-app.use(cors());
-
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Methods", "GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS");
+  res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, api_key, Authorization");
   next();
 });
