@@ -82,7 +82,15 @@ router.use('/find', passport.authenticate('jwt', {session: false}), require('./c
 router.use('/like', passport.authenticate('jwt', {session: false}), require('./controllers/like'));
 
 app.use('/api/v1', router);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+const options = {
+  swaggerOptions: {
+    validatorUrl: null,
+    cors: true,
+  }
+};
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 // Error logging
 app.use(function (err, req, res, next) {
