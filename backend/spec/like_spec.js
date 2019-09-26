@@ -15,7 +15,7 @@ describe('Find tests', function() {
       longitude: 10,
       latitude: 10
     },
-    maxDistance: 1000,
+    maxDistance: 100,
     ageRange: {
       min: 20,
       max: 30
@@ -33,7 +33,7 @@ describe('Find tests', function() {
       longitude: 10,
       latitude: 10
     },
-    maxDistance: 1000,
+    maxDistance: 100,
     ageRange: {
       min: 20,
       max: 30
@@ -105,6 +105,47 @@ describe('Find tests', function() {
       .post(`/api/v1/like/${audrey.userId}`)
       .set('Authorization', users[1].accessToken);
     expect(res.status).toEqual(200);
+
+    done();
+  });
+
+  it('can not find profiles you liked', async function(done) {
+    const users = await require('./bootstrap')(2);
+
+    // Create 2 profiles
+    let res = await request(app)
+      .post('/api/v1/profile')
+      .send(jason)
+      .set('Authorization', users[0].accessToken)
+    expect(res.status).toEqual(200);
+  
+    res = await request(app)
+      .post('/api/v1/profile')
+      .send(audrey)
+      .set('Authorization', users[1].accessToken);
+    expect(res.status).toEqual(200);
+
+    res = await request(app)
+      .get('/api/v1/find')
+      .set('Authorization', users[1].accessToken);
+    expect(res.status).toEqual(200);
+    expect(res.body.length).toEqual(1); // jason returned
+    // Check that the profiles are the exact profiles we sent
+    const jasonRes = res.body.find(p => p.name === 'Jason');
+    compareProfileWithResponse(jason, jasonRes);
+
+    // Get Jason's userId and like him
+    const jasonId = jasonRes.userId;
+    res = await request(app)
+      .post(`/api/v1/like/${jasonId}`)
+      .set('Authorization', users[1].accessToken);
+    expect(res.status).toEqual(200);
+
+    res = await request(app)
+      .get('/api/v1/find')
+      .set('Authorization', users[1].accessToken);
+    expect(res.status).toEqual(200);
+    expect(res.body.length).toEqual(0); // no more jason
 
     done();
   });
