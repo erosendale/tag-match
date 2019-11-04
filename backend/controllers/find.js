@@ -95,20 +95,15 @@ function findTags(profile) {
         MATCH (d:Profile)-[:TAGGED]->(:Tag {value: tag})
         MATCH (d)-[:TAGGED]->(t:Tag)
         MATCH (p:Profile { userId: {userId} })
-        WHERE NOT (d)-[:LIKES]->(p) AND NOT d.userId = {userId} AND
-            distance(d.location, point({latitude: {latitude}, longitude: {longitude}})) <= {maxDistance} AND 
-            {minAge} <= duration.between(d.dateOfBirth, date()).years <= {maxAge}
+        WHERE NOT (d)-[:LIKES]-(p) AND NOT d.userId = {userId} AND
+            distance(d.location, p.location) <= p.maxDistance AND 
+            p.ageRangeMin <= duration.between(d.dateOfBirth, date()).years <= p.ageRangeMax
         RETURN DISTINCT d, t.value as tag,
         toString(d.dateOfBirth) as dob,
         d.location.longitude as longitude, 
         d.location.latitude as latitude`, {
             tags: profile.tags,
-            latitude: profile.location.latitude,
-            longitude: profile.location.longitude,
-            maxDistance: profile.maxDistance,
-            userId: profile.userId,
-            minAge: profile.ageRange.min,
-            maxAge: profile.ageRange.max
+            userId: profile.userId
         })
         .then(result => {
             const profiles = getProfilesFromRecords(result.records);

@@ -15,7 +15,7 @@ describe('Find tests', function() {
       longitude: 10,
       latitude: 10
     },
-    maxDistance: 1000,
+    maxDistance: 100,
     ageRange: {
       min: 20,
       max: 30
@@ -30,10 +30,10 @@ describe('Find tests', function() {
     tags: ['hockey', 'math', 'metal'],
     photos: ["face.jpg"],
     location: {
-      longitude: 10,
-      latitude: 10
+      longitude: 10.1,
+      latitude: 10.3
     },
-    maxDistance: 1000,
+    maxDistance: 100,
     ageRange: {
       min: 20,
       max: 30
