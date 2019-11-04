@@ -12,3 +12,14 @@ They can then use the find feature to find other people nearby in their age rang
 Then they can like other users that they are interested in connecting with from the find feature.
 
 Further updates to this app would include a matches feature to return users that have matched with the logged in user, as well as a chat feature.
+
+Local testing:
+Navigate to local_stack/
+sh script/build.sh
+sh script/start.sh
+
+Navigate back to the route
+npm test
+
+Launch the app:
+npm run start
