@@ -9,8 +9,8 @@ image:
 
 # define environment variables here as a map of key: value
 env:
-  MONGO_URL: mongodb.staging.tag-match.com
-  MONGO_AUTH_DB: auth
+  MONGO_URL: tag-match-staging-0hiqx.gcp.mongodb.net
+  MONGO_AUTH_DB: test
   NEO4J_URL: neo4j.staging.tag-match.com
 
 envSecretsUsernames:

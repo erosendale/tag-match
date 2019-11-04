@@ -9,7 +9,7 @@ mongoose.set('useCreateIndex', true);
 
 function getConnection() {
     return new Promise((resolve, reject) => {
-        mongoose.connect(`mongodb://${dbUsername}:${dbPassword}@${dbUrl}/${dbCollection}?authSource=admin&w=1`, { 
+        mongoose.connect(`mongodb://${dbUsername}:${dbPassword}@${dbUrl}/${dbCollection}?authSource=admin&retryWrites=true&w=majority`, { 
             useNewUrlParser: true, //fixes an issue with a depricated default in Mongoose.js
             connectTimeoutMS: 1800 //The default is 30 secs! Crazy!
         })
