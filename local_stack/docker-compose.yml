@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   mongo:
-    image: mongo:latest
+    image: mongo:4.0
     restart: always
     ports:
       - 27017:27017
@@ -13,7 +13,7 @@ services:
     container_name: tag-match-mongo
 
   mongo-express:
-    image: mongo-express
+    image: mongo-express:0.54
     restart: always
     ports:
       - 8081:8081
@@ -22,7 +22,7 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
 
   neo4j:
-    image: neo4j:latest
+    image: neo4j:3.5.15
     ports:
       - 7474:7474
       #- 7473:7473 HTTPS
