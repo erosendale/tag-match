@@ -25,6 +25,8 @@ sh script/start.sh
 
 cd ../backend
 
+npm install
+
 npm test
 
 Launch the app:

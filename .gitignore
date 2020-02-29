@@ -1,3 +1,4 @@
 /backend/node_modules
 /backend/requestLog.txt
 /backend/errorLog.txt
+.DS_Store
