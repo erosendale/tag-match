@@ -13,8 +13,6 @@ Then they can like other users that they are interested in connecting with from 
 
 Further updates to this app would include a matches feature to return users that have matched with the logged in user, as well as a chat feature.
 
-Auth tutorial: https://medium.com/@therealchrisrutherford/nodejs-authentication-with-passport-and-jwt-in-express-3820e256054f
-
 Local testing:
 
 cd local_stack/
