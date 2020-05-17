@@ -38,7 +38,7 @@ Select the local server from the dropdown
 
 Create a login from /users/register, then use it to login /users/login and get an authorization token
 
-Input the auth token response after 'Bearer' to the 'Autorize' button on the top right
+Input the auth token response after 'Bearer' to the 'Authorize' button on the top right
 
 Now you can create a profile, or many (under different logins), and find and like other nearby profiles. 
 The tests do all of this for several users.
